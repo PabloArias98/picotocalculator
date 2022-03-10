@@ -3,9 +3,16 @@
 #include <stdio.h>
 #include <math.h>
 
-//ID´s
-enum {ID_EDIT, ID_BOTONIGUAL, ID_BOTONRESET, ID_BOTONRESET2, ID_BOTONSUMAR, ID_BOTONRESTAR, ID_BOTONMULTIPLICAR, ID_BOTONDIVIDIR, ID_BOTONCOMA, ID_BOTONSIGNO, ID_BOTONCERO, ID_BOTON1, ID_BOTON2, ID_BOTON3, ID_BOTON4, ID_BOTON5, ID_BOTON6, ID_BOTON7, ID_BOTON8, ID_BOTON9};
+#define IDM_FILE_RESET 102
+#define IDM_FILE_EXIT 103
 
+
+
+//ID´s
+enum {ID_EDIT, ID_BOTONIGUAL, ID_BOTONRESET, ID_BOTONRESET2, ID_BOTONSUMAR, ID_BOTONRESTAR,
+      ID_BOTONMULTIPLICAR, ID_BOTONDIVIDIR, ID_BOTONCOMA, ID_BOTONSIGNO, ID_BOTONCERO, ID_BOTON1,
+      ID_BOTON2, ID_BOTON3, ID_BOTON4, ID_BOTON5, ID_BOTON6, ID_BOTON7, ID_BOTON8, ID_BOTON9
+     };
 
 //Prototipos
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -13,11 +20,15 @@ LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 //funcion para imprimir en pantalla
 void imprimirEdit (int i);
 
+//funcion que anade el menu
+void anadirMenus(HWND);
+
 //mensajes de info
 int mostrarMensajeReset();
 int mostrarMensajeReset2();
 int mostrarMensajeError();
-int confirmarCerradoPrograma();                                                 //Funcion que concatena los numeros en pantalla
+int confirmarCerradoPrograma();
+//Funcion que concatena los numeros en pantalla
 double calcular (double primer_num, double segundo_num, int operacion);     //Funcion que realiza las operaciones
 
 HINSTANCE estancia;
@@ -77,7 +88,6 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 
     //Le damos una tonalidad verde al fondo de la app
     wincl.hbrBackground = (HBRUSH) CreateSolidBrush (RGB(157, 249, 121));
-
     if (!RegisterClassEx (&wincl))
         return 0;
 
@@ -113,7 +123,105 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 }
 
 
+
+int confirmarCerradoPrograma()
+{
+    int msgboxID = MessageBox(
+                       NULL,
+                       "Saldrá del programa, desea continuar?",
+                       "Salir",
+                       MB_ICONEXCLAMATION | MB_YESNO
+                   );
+
+    if (msgboxID == IDYES)
+    {
+        PostQuitMessage (0);
+    }
+    else
+    {
+
+    }
+    return msgboxID;
+}
+
+int mostrarMensajeError()
+{
+    int msgboxID = MessageBox(
+                       NULL,
+                       "Elija una operación para continuar, por favor",
+                       "Seleccione operación",
+                       MB_OK
+                   );
+
+    if (msgboxID == IDOK)
+    {
+
+    }
+
+    return msgboxID;
+}
+
+int mostrarMensajeReset()
+{
+    int msgboxID = MessageBox(
+                       NULL,
+                       "Se borrarán todos los datos y operaciones introducidos",
+                       "Confirmar Reset",
+                       MB_OK
+                   );
+
+    if (msgboxID == IDOK)
+    {
+
+    }
+
+    return msgboxID;
+}
+
+int mostrarMensajeReset2()
+{
+    int msgboxID = MessageBox(
+                       NULL,
+                       "Se borrará lo último introducido",
+                       "Confirmar borrado",
+                       MB_OK
+                   );
+
+    if (msgboxID == IDOK)
+    {
+
+    }
+
+    return msgboxID;
+}
+
+void anadirMenus(HWND hwnd)
+{
+
+    HMENU hMenubar;
+    HMENU hMenu;
+
+    hMenubar = CreateMenu();
+    hMenu = CreateMenu();
+
+    AppendMenuW(hMenu, MF_STRING, IDM_FILE_RESET, L"&Resetear");
+    AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+    AppendMenuW(hMenu, MF_STRING, IDM_FILE_EXIT, L"&Salir");
+
+    AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR) hMenu, L"&Sesion");
+    SetMenu(hwnd, hMenubar);
+}
 /*  This function is called by the Windows function DispatchMessage()  */
+void imprimirEdit (int i)                        //Funcion que concatena los numeros al hacer clic en los botones
+{
+    char cadenaEdit [31];                        //Se guarda la cadena de la pantalla
+    char numero [3];                             //Variable donde se guardara el numero de la tecla que presionamos
+    sprintf (numero, "%i", i);                   //Se transforma el numero (i) del tipo entero a una cadena
+
+    GetWindowText (edit, cadenaEdit, 30);        //Se obtiene lo que hay en el edit y se guarda en "CadenaEdit"
+    strcat (cadenaEdit, numero);                 //Se concatena lo que hay en cadena y lo que hay en "memoria", es decir, el valor de la tecla presionada
+    SetWindowText (edit, cadenaEdit);            //Se imprime el nuevo numero en pantalla
+}
 
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -128,11 +236,13 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
     switch (message)
     {
+
     case WM_CREATE:
     {
+
         //Componentes
         edit = CreateWindowEx (WS_EX_CLIENTEDGE, "edit", 0, ES_RIGHT | ES_NUMBER | WS_BORDER | WS_CHILD | WS_VISIBLE, 20, 30, 250, 55, hwnd, (HMENU)ID_EDIT, estancia, 0);
-
+anadirMenus(hwnd);
         boton1 = CreateWindow ("Button", "1", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 20, 90, 40, 25, hwnd, (HMENU) ID_BOTON1, estancia, 0);
         boton2 = CreateWindow ("Button", "2", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 65, 90, 40, 25, hwnd, (HMENU) ID_BOTON2, estancia, 0);
         boton3 = CreateWindow ("Button", "3", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 110, 90, 40, 25, hwnd, (HMENU) ID_BOTON3, estancia, 0);
@@ -167,6 +277,22 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
     case WM_COMMAND:
     {
+       switch(LOWORD(wParam))
+            {
+
+         case IDM_FILE_RESET:
+                mostrarMensajeReset();
+                operando_1 = 0;
+                operando_2 = 0;
+                operacion = 0;
+                SetWindowText (edit, "");
+                break;
+
+            case IDM_FILE_EXIT:
+                confirmarCerradoPrograma();
+                break;
+        }
+
         switch (wParam)
         {
         case ID_BOTON1:                  //Al presionar el boton 1 se llama a la funcion "imprimirEdit" y se le envia el valor "1" que es lo que queremos que se concatene a lo que ya haya en el edit
@@ -299,14 +425,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             SetWindowText (edit, "");
             break;
         }
-
-        break;
+            break;
         }
         break;
     }
+
     case WM_CLOSE:
         confirmarCerradoPrograma();
         break;
+
     default:
         return DefWindowProc (hwnd, message, wParam, lParam);
     }
@@ -314,87 +441,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     return 0;
 }
 
-int confirmarCerradoPrograma()
-{
-    int msgboxID = MessageBox(
-                       NULL,
-                       "Saldrá del programa, desea continuar?",
-                       "Salir",
-                       MB_ICONEXCLAMATION | MB_YESNO
-                   );
 
-    if (msgboxID == IDYES)
-    {
-        PostQuitMessage (0);
-    }
-    else
-    {
 
-    }
-    return msgboxID;
-}
-
-int mostrarMensajeError()
-{
-    int msgboxID = MessageBox(
-                       NULL,
-                       "Elija una operación para continuar, por favor",
-                       "Seleccione operación",
-                       MB_OK
-                   );
-
-    if (msgboxID == IDOK)
-    {
-
-    }
-
-    return msgboxID;
-}
-
-int mostrarMensajeReset()
-{
-    int msgboxID = MessageBox(
-                       NULL,
-                       "Se borrarán todos los datos y operaciones introducidos",
-                       "Confirmar Reset",
-                       MB_OK
-                   );
-
-    if (msgboxID == IDOK)
-    {
-
-    }
-
-    return msgboxID;
-}
-
-int mostrarMensajeReset2()
-{
-    int msgboxID = MessageBox(
-                       NULL,
-                       "Se borrará lo último introducido",
-                       "Confirmar borrado",
-                       MB_OK
-                   );
-
-    if (msgboxID == IDOK)
-    {
-
-    }
-
-    return msgboxID;
-}
-
-void imprimirEdit (int i)                        //Funcion que concatena los numeros al hacer clic en los botones
-{
-    char cadenaEdit [31];                        //Se guarda la cadena de la pantalla
-    char numero [3];                             //Variable donde se guardara el numero de la tecla que presionamos
-    sprintf (numero, "%i", i);                   //Se transforma el numero (i) del tipo entero a una cadena
-
-    GetWindowText (edit, cadenaEdit, 30);        //Se obtiene lo que hay en el edit y se guarda en "CadenaEdit"
-    strcat (cadenaEdit, numero);                 //Se concatena lo que hay en cadena y lo que hay en "memoria", es decir, el valor de la tecla presionada
-    SetWindowText (edit, cadenaEdit);            //Se imprime el nuevo numero en pantalla
-}
 
 double calcular (double op_1, double op_2, int operacion)   //Funcion para calcular
 {
@@ -424,7 +472,7 @@ double calcular (double op_1, double op_2, int operacion)   //Funcion para calcu
     }
     default:                                                         //Si no se realiza ninguna operacion se imprime en el label un mensaje, con esto sabriamos si ha habido algun error
     {
-        mostrarMensajeError();
+
         break;
     }
     }
