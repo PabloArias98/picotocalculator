@@ -27,6 +27,7 @@ void anadirMenus(HWND);
 int mostrarMensajeReset();
 int mostrarMensajeReset2();
 int mostrarMensajeError();
+int mostrarRecuadroAcercaDe();
 int confirmarCerradoPrograma();
 //Funcion que concatena los numeros en pantalla
 double calcular (double primer_num, double segundo_num, int operacion);     //Funcion que realiza las operaciones
@@ -141,6 +142,19 @@ int confirmarCerradoPrograma()
     {
 
     }
+    return msgboxID;
+}
+
+int mostrarRecuadroAcercaDe()
+{
+    int msgboxID = MessageBox(
+                       NULL,
+                       "Picoto Calculator 0.2b, gracias por usar este programa!",
+                       "Acerca de...",
+                       MB_OK
+                   );
+
+
     return msgboxID;
 }
 
@@ -300,6 +314,9 @@ anadirMenus(hwnd);
 
             case IDM_FILE_EXIT:
                 confirmarCerradoPrograma();
+                break;
+            case IDM_FILE_ABOUT:
+                mostrarRecuadroAcercaDe();
                 break;
         }
 
