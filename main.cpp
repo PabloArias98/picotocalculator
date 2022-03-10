@@ -6,7 +6,7 @@
 #define IDM_FILE_RESET 102
 #define IDM_FILE_EXIT 103
 
-
+#define IDM_FILE_ABOUT 110
 
 //ID´s
 enum {ID_EDIT, ID_BOTONIGUAL, ID_BOTONRESET, ID_BOTONRESET2, ID_BOTONSUMAR, ID_BOTONRESTAR,
@@ -96,8 +96,8 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
                szClassName,         /* Classname */
                "Picoto Calculator v0.1",
                WS_OVERLAPPEDWINDOW, /* default window */
-               CW_USEDEFAULT,       /* Windows decides the position */
-               CW_USEDEFAULT,       /* where the window ends up on the screen */
+               450,       /* Windows decides the position */
+               360,       /* where the window ends up on the screen */
                310,                 /* The programs width */
                350,                 /* and height in pixels */
                HWND_DESKTOP,        /* The window is a child-window to desktop */
@@ -199,16 +199,26 @@ void anadirMenus(HWND hwnd)
 {
 
     HMENU hMenubar;
-    HMENU hMenu;
+    HMENU hMenu, hMenu2, hMenu3;
 
     hMenubar = CreateMenu();
     hMenu = CreateMenu();
+    hMenu2 = CreateMenu();
+    hMenu3 = CreateMenu();
 
     AppendMenuW(hMenu, MF_STRING, IDM_FILE_RESET, L"&Resetear");
     AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
     AppendMenuW(hMenu, MF_STRING, IDM_FILE_EXIT, L"&Salir");
 
+    AppendMenuW(hMenu2, MF_STRING, 0, L"&En proximas versiones, paciencia!");
+
+    AppendMenuW(hMenu3, MF_STRING, 0, L"&Temas de ayuda");
+    AppendMenuW(hMenu3, MF_SEPARATOR, 0, NULL);
+    AppendMenuW(hMenu3, MF_STRING, IDM_FILE_ABOUT, L"&Acerca de...");
+
     AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR) hMenu, L"&Sesion");
+    AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR) hMenu2, L"&Edicion");
+    AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR) hMenu3, L"&Ayuda");
     SetMenu(hwnd, hMenubar);
 }
 /*  This function is called by the Windows function DispatchMessage()  */
