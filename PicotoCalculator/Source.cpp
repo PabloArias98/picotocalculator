@@ -5,7 +5,7 @@
 
 #define IDM_FILE_RESET 102
 #define IDM_FILE_EXIT 103
-
+#define IDM_PROGRAM_HELP 104
 #define IDM_FILE_ABOUT 110
 
 //ID´s
@@ -17,6 +17,7 @@ enum {
 
 //Prototipos
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WindowProcedureChild(HWND, UINT, WPARAM, LPARAM);
 
 //funcion para imprimir en pantalla
 void imprimirEdit(int i);
@@ -61,15 +62,23 @@ HWND botonRaiz;
 
 
 const TCHAR szClassName[] = _T("CodeBlocksWindowsApp");
+const TCHAR szChildClassName[] = _T("Temas de Ayuda");
 
-int WINAPI WinMain(HINSTANCE hThisInstance,
-    HINSTANCE hPrevInstance,
-    LPSTR lpszArgument,
-    int nCmdShow)
+//Instancia global
+HINSTANCE hInst;
+HWND hChild;
+int cmdShowGlobal;
+
+int WINAPI WinMain(_In_ HINSTANCE hThisInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPSTR lpszArgument,
+    _In_ int nCmdShow)
 {
     HWND hwnd;               /* This is the handle for our window */
     MSG messages;            /* Here messages to the application are saved */
     WNDCLASSEX wincl;        /* Data structure for the windowclass */
+    WNDCLASSEX winhelp;
+
 
     estancia = hThisInstance;
 
@@ -79,9 +88,6 @@ int WINAPI WinMain(HINSTANCE hThisInstance,
     wincl.lpfnWndProc = WindowProcedure;      /* This function is called by windows */
     wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
-
-    /* Use default icon and mouse-pointer */
-
     wincl.hIcon = (HICON)LoadImage(NULL, _T("icono.ico"), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);;
     wincl.hIconSm = LoadIcon(estancia, IDI_APPLICATION);
     wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -89,11 +95,28 @@ int WINAPI WinMain(HINSTANCE hThisInstance,
     wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
     wincl.cbWndExtra = 0;                      /* structure or the window instance */
 
+    /* The Window Child structure */
+    winhelp.hInstance = hThisInstance;
+    winhelp.lpszClassName = szChildClassName;
+    winhelp.lpfnWndProc = WindowProcedureChild;
+    winhelp.style = CS_DBLCLKS;
+    winhelp.cbSize = sizeof(WNDCLASSEX);
+    winhelp.hIcon = (HICON)LoadImage(NULL, _T("icono.ico"), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);;
+    winhelp.hIconSm = LoadIcon(estancia, IDI_APPLICATION);
+    winhelp.hCursor = LoadCursor(NULL, IDC_ARROW);
+    winhelp.lpszMenuName = NULL; 
+    winhelp.cbClsExtra = 0;
+    winhelp.cbWndExtra = 0;
+
 
     //Le damos una tonalidad verde al fondo de la app
     wincl.hbrBackground = (HBRUSH)CreateSolidBrush(RGB(157, 249, 121));
-    if (!RegisterClassEx(&wincl))
+
+    //Registramos las clases
+    if (!RegisterClassEx(&wincl) && !RegisterClassEx(&winhelp))
         return 0;
+
+  
 
     hwnd = CreateWindowEx(
         0,                   /* Extended possibilites for variation */
@@ -109,6 +132,10 @@ int WINAPI WinMain(HINSTANCE hThisInstance,
         hThisInstance,       /* Program Instance handler */
         NULL                 /* No Window Creation data */
     );
+
+    //Guardamos la instancia de la aplicación en la variable global
+    hInst = hThisInstance;
+    cmdShowGlobal = nCmdShow;
 
     /* Make the window visible on the screen */
     ShowWindow(hwnd, nCmdShow);
@@ -214,7 +241,7 @@ void anadirMenus(HWND hwnd)
 
     AppendMenuW(hMenu2, MF_STRING, 0, L"&En proximas versiones, paciencia!");
 
-    AppendMenuW(hMenu3, MF_STRING, 0, L"&Temas de ayuda");
+    AppendMenuW(hMenu3, MF_STRING, IDM_PROGRAM_HELP, L"&Temas de ayuda");
     AppendMenuW(hMenu3, MF_SEPARATOR, 0, NULL);
     AppendMenuW(hMenu3, MF_STRING, IDM_FILE_ABOUT, L"&Acerca de...");
 
@@ -235,10 +262,22 @@ void imprimirEdit(int i)                        //Funcion que concatena los nume
     SetWindowText(edit, cadenaEdit);            //Se imprime el nuevo numero en pantalla
 }
 
+LRESULT CALLBACK WindowChildProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    switch (msg) {
+    case WM_CLOSE:
+        DestroyWindow(hWnd);
+        break;
+    default:
+        return DefWindowProc(hWnd, msg, wp, lp);
+    }
+}
+
+
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
+    HINSTANCE hInstance;
 
     //Variables
     char cadenaEditMain[31];
@@ -252,8 +291,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     case WM_CREATE:
     {
 
-        //Componentes
         edit = CreateWindowEx(WS_EX_CLIENTEDGE, _T("edit"), 0, ES_RIGHT | ES_NUMBER | WS_BORDER | WS_CHILD | WS_VISIBLE, 20, 30, 250, 55, hwnd, (HMENU)ID_EDIT, estancia, 0);
+        
         anadirMenus(hwnd);
         boton1 = CreateWindow("Button", "1", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 20, 90, 40, 25, hwnd, (HMENU)ID_BOTON1, estancia, 0);
         boton2 = CreateWindow("Button", "2", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 65, 90, 40, 25, hwnd, (HMENU)ID_BOTON2, estancia, 0);
@@ -276,6 +315,20 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         botonIgual = CreateWindow("Button", "=", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 20, 220, 80, 45, hwnd, (HMENU)ID_BOTONIGUAL, estancia, 0);
         botonReset = CreateWindow("Button", "C", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 185, 250, 40, 25, hwnd, (HMENU)ID_BOTONRESET, estancia, 0);
         botonReset2 = CreateWindow("Button", "CE", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 235, 250, 40, 25, hwnd, (HMENU)ID_BOTONRESET2, estancia, 0);
+        
+        //Y por último creamos la ventana hija
+        hChild = CreateWindow(
+            szChildClassName,
+            _T("Temas de Ayuda"),
+            WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CHILD,
+            50,
+            50,
+            1450,
+            300,
+            hwnd,
+            NULL,
+            estancia,
+            0);
 
         //Bloquear el boton "maximizar"
         DWORD dwStyle = (DWORD)GetWindowLong(hwnd, GWL_STYLE);
@@ -287,13 +340,13 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         dwStyle &= ~WS_SIZEBOX;
         SetWindowLong(hwnd, GWL_STYLE, (DWORD)dwStyle);
         RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME | RDW_ERASENOW);
+
     }
 
     case WM_COMMAND:
     {
         switch (LOWORD(wParam))
         {
-
         case IDM_FILE_RESET:
             mostrarMensajeReset();
             operando_1 = 0;
@@ -301,9 +354,14 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             operacion = 0;
             SetWindowText(edit, "");
             break;
-
         case IDM_FILE_EXIT:
             confirmarCerradoPrograma();
+            break;
+        case IDM_PROGRAM_HELP:
+            //Mostramos el cuadro de temas de Ayuda
+            //Mostramos la segunda ventana
+            ShowWindow(hChild, cmdShowGlobal);
+            UpdateWindow(hChild);
             break;
         case IDM_FILE_ABOUT:
             mostrarRecuadroAcercaDe();
@@ -474,6 +532,32 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     return 0;
 }
 
+LRESULT CALLBACK WindowProcedureChild(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int wmId, wmEvent;
+    PAINTSTRUCT ps;
+    HDC hdc;
+
+    switch (message)
+    {
+    case WM_COMMAND:
+        wmId = LOWORD(wParam);
+        wmEvent = HIWORD(wParam);
+
+        break;
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: Add any drawing code here...
+        EndPaint(hWnd, &ps);
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
 
 double calcular(double op_1, double op_2, int operacion)   //Funcion para calcular
 {

@@ -1,5 +1,7 @@
 ﻿  Source.cpp
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(126,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(241,9): warning C4101: 'hdc': variable local sin referencia
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(240,17): warning C4101: 'ps': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(153,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(279,9): warning C4101: 'hdc': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(278,17): warning C4101: 'ps': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(280,15): warning C4101: 'hInstance': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(273): warning C4715: 'WindowChildProcedure': no todas las rutas de acceso de control devuelven un valor
   PicotoCalculator.vcxproj -> C:\Users\Pablo\source\repos\PicotoCalculator\x64\Debug\PicotoCalculator.exe
