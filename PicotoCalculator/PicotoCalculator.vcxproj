@@ -143,9 +143,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="WndPila.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="WndPila.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PicotoCalculator.rc" />
