@@ -42,9 +42,6 @@ int confirmarCerradoPrograma();
 //Funcion que concatena los numeros en pantalla
 double calcular(double primer_num, double segundo_num, int operacion);     //Funcion que realiza las operaciones
 
-
-
-
 //Botones
 HWND boton1;
 HWND boton2;
@@ -67,14 +64,14 @@ HWND botonMultiplicar;
 HWND botonDividir;
 HWND botonPotencia;
 HWND botonRaiz;
+HWND botonAceptar;
 
 
 const TCHAR szClassName[] = _T("CodeBlocksWindowsApp");
 const TCHAR szChildClassName[] = _T("Temas de Ayuda");
 
-BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, LPCSTR NombreMenu, WNDPROC WndProcedimiento) {
+BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, LPCSTR NombreMenu, WNDPROC WndProcedimiento, HBRUSH color) {
     WNDCLASSEX wc;
-
     wc.style = CS_DBLCLKS;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.cbClsExtra = 0;
@@ -86,8 +83,7 @@ BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, 
     wc.hIcon = (HICON)LoadImage(NULL, _T("icono.ico"), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
     wc.hIconSm = LoadIcon(estancia, IDI_APPLICATION);
     wc.lpfnWndProc = WndProcedimiento;
-
-    wc.hbrBackground = (HBRUSH)CreateSolidBrush(RGB(157, 249, 121));
+    wc.hbrBackground = color;
 
     if (RegisterClassEx(&wc)) {
         return  TRUE;
@@ -105,12 +101,12 @@ int WINAPI WinMain(_In_ HINSTANCE hThisInstance,
 
 
 
-    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szClassName, NULL, WindowProcedure)) {
+    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szClassName, NULL, WindowProcedure, (HBRUSH)CreateSolidBrush(RGB(157, 249, 121)) ) ) {
         MessageBox(NULL, "No se Pudo Iniciar la Aplicación", "Error", MB_ICONERROR | MB_OK);
         return -1;
     }
 
-    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szChildClassName, NULL, WindowProcedureChild)) {
+    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szChildClassName, NULL, WindowProcedureChild, (HBRUSH)CreateSolidBrush(RGB(255, 255, 255)) ) ) {
         MessageBox(NULL, "No se Pudo Iniciar la Aplicación", "Error", MB_ICONERROR | MB_OK);
         return -1;
     }
@@ -517,7 +513,12 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 LRESULT CALLBACK WindowProcedureChild(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static HINSTANCE estancia = NULL;
     switch (message) {
+    //case WM_CREATE: {
+     //   estancia = ((LPCREATESTRUCT)lParam)->hInstance;
+     //   botonAceptar = CreateWindow("Button", "Aceptar", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 20, 120, 40, 25, hWnd, NULL, estancia, 0);
+    //}
     case WM_CLOSE: {
         DestroyWindow(WndPila_QuitarCima(&Pila));
         EnableWindow(WndPila_Cima(Pila), TRUE);
@@ -533,7 +534,7 @@ LRESULT CALLBACK WindowProcedureChild(HWND hWnd, UINT message, WPARAM wParam, LP
 
 double calcular(double op_1, double op_2, int operacion)   //Funcion para calcular
 {
-    double resultado;                                                    //Variable donde se guardara el resultado (sera lo que se retorne)
+    double resultado = 0;                                                    //Variable donde se guardara el resultado (sera lo que se retorne)
 
     switch (operacion)                                                   //Ver lo que hay en la variable "operacion"
     {
