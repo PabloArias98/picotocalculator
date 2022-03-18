@@ -1,5 +1,5 @@
 ﻿  Source.cpp
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(152,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(269,9): warning C4101: 'hdc': variable local sin referencia
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(268,17): warning C4101: 'ps': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(168,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(272,9): warning C4101: 'hdc': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(271,17): warning C4101: 'ps': variable local sin referencia
   PicotoCalculator.vcxproj -> C:\Users\Pablo\source\repos\PicotoCalculator\x64\Debug\PicotoCalculator.exe

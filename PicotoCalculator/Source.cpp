@@ -9,6 +9,9 @@
 #define IDM_FILE_EXIT 103
 #define IDM_PROGRAM_HELP 104
 #define IDM_FILE_ABOUT 110
+#define ID_CLOSE_HELP 200
+#define ID_CLOSE_ABOUT 300
+#define ID_GITHUB 301
 
 //ID´s
 enum {
@@ -26,6 +29,7 @@ HWND edit;
 //Prototipos
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WindowProcedureChild(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WindowProcedureAbout(HWND, UINT, WPARAM, LPARAM);
 
 //funcion para imprimir en pantalla
 void imprimirEdit(int i);
@@ -65,13 +69,21 @@ HWND botonDividir;
 HWND botonPotencia;
 HWND botonRaiz;
 HWND botonAceptar;
+HWND botonGitHub;
 
 
 const TCHAR szClassName[] = _T("CodeBlocksWindowsApp");
 const TCHAR szChildClassName[] = _T("Temas de Ayuda");
+const TCHAR szAboutClassName[] = _T("Acerca de");
+const TCHAR iconoPrograma[] = _T("icono.ico");
+const TCHAR iconoAyuda[] = _T("ayuda.ico");
 
-BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, LPCSTR NombreMenu, WNDPROC WndProcedimiento, HBRUSH color) {
+BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, LPCSTR NombreMenu, WNDPROC WndProcedimiento, HBRUSH color, LPCSTR direccion_icono) {
     WNDCLASSEX wc;
+    estancia = hThisInstance;
+    
+    HICON icono = (HICON)LoadImage(0, direccion_icono, IMAGE_ICON, 32, 32, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+
     wc.style = CS_DBLCLKS;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.cbClsExtra = 0;
@@ -80,10 +92,11 @@ BOOL RegistrarClaseEx(UINT Estilo, HINSTANCE hThisInstance, LPCSTR szClassName, 
     wc.lpszClassName = szClassName;
     wc.lpszMenuName = NULL;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hIcon = (HICON)LoadImage(NULL, _T("icono.ico"), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+    wc.hIcon = icono;
     wc.hIconSm = LoadIcon(estancia, IDI_APPLICATION);
     wc.lpfnWndProc = WndProcedimiento;
     wc.hbrBackground = color;
+
 
     if (RegisterClassEx(&wc)) {
         return  TRUE;
@@ -101,17 +114,20 @@ int WINAPI WinMain(_In_ HINSTANCE hThisInstance,
 
 
 
-    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szClassName, NULL, WindowProcedure, (HBRUSH)CreateSolidBrush(RGB(157, 249, 121)) ) ) {
+    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szClassName, NULL, WindowProcedure, (HBRUSH)CreateSolidBrush(RGB(157, 249, 121)), iconoPrograma)) {
         MessageBox(NULL, "No se Pudo Iniciar la Aplicación", "Error", MB_ICONERROR | MB_OK);
         return -1;
     }
 
-    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szChildClassName, NULL, WindowProcedureChild, (HBRUSH)CreateSolidBrush(RGB(255, 255, 255)) ) ) {
+    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szChildClassName, NULL, WindowProcedureChild, (HBRUSH)CreateSolidBrush(RGB(255, 255, 255)), iconoAyuda ) ) {
         MessageBox(NULL, "No se Pudo Iniciar la Aplicación", "Error", MB_ICONERROR | MB_OK);
         return -1;
     }
 
-
+    if (!RegistrarClaseEx(CS_DBLCLKS, hThisInstance, szAboutClassName, NULL, WindowProcedureAbout, (HBRUSH)CreateSolidBrush(RGB(255, 255, 255)), iconoPrograma)) {
+        MessageBox(NULL, "No se Pudo Iniciar la Aplicación", "Error", MB_ICONERROR | MB_OK);
+        return -1;
+    }
 
     //Le damos una tonalidad verde al fondo de la app
     
@@ -172,19 +188,6 @@ int confirmarCerradoPrograma()
     {
 
     }
-    return msgboxID;
-}
-
-int mostrarRecuadroAcercaDe()
-{
-    int msgboxID = MessageBox(
-        NULL,
-        _T("Picoto Calculator 0.2b, gracias por usar este programa!"),
-        _T("Acerca de..."),
-        MB_OK
-    );
-
-
     return msgboxID;
 }
 
@@ -336,13 +339,16 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             confirmarCerradoPrograma();
             break;
         case IDM_PROGRAM_HELP:
-            Wnd = CreateWindowEx(0, szChildClassName, "Temas de Ayuda", WS_OVERLAPPEDWINDOW, 100, 100, 400, 400, hwnd, NULL, estancia, NULL);
+            Wnd = CreateWindowEx(0, szChildClassName, "Temas de Ayuda", WS_OVERLAPPEDWINDOW, 500, 270, 400, 400, hwnd, NULL, estancia, NULL);
             EnableWindow(WndPila_Cima(Pila), FALSE);
             WndPila_Insertar(&Pila, Wnd);
             ShowWindow(Wnd, SW_NORMAL);
             break;
         case IDM_FILE_ABOUT:
-            mostrarRecuadroAcercaDe();
+            Wnd = CreateWindowEx(0, szAboutClassName, "Acerca de", WS_OVERLAPPEDWINDOW, 500, 270, 400, 400, hwnd, NULL, estancia, NULL);
+            EnableWindow(WndPila_Cima(Pila), FALSE);
+            WndPila_Insertar(&Pila, Wnd);
+            ShowWindow(Wnd, SW_NORMAL);
             break;
         }
 
@@ -514,15 +520,98 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 LRESULT CALLBACK WindowProcedureChild(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HINSTANCE estancia = NULL;
+    const wchar_t cadena_texto[] = L"Bienvenido a Picoto Calculator, el uso es bastante fácil. Cuenta con un diseño ergonómico y 6 diferentes funciones: suma, resta, multiplicación, división, raíz y potencia. Espero que la disfrute!";
     switch (message) {
-    //case WM_CREATE: {
-     //   estancia = ((LPCREATESTRUCT)lParam)->hInstance;
-     //   botonAceptar = CreateWindow("Button", "Aceptar", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 20, 120, 40, 25, hWnd, NULL, estancia, 0);
-    //}
+    case WM_CREATE: {
+        estancia = ((LPCREATESTRUCT)lParam)->hInstance;
+        CreateWindowW(L"static", cadena_texto, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 20, 80, 345, 200, hWnd, NULL, NULL, NULL);
+        botonAceptar = CreateWindow("Button", "Aceptar", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 135, 320, 120, 25, hWnd, (HMENU)ID_CLOSE_HELP, estancia, 0);
+
+        //Bloquear el boton "maximizar"
+        DWORD dwStyle = (DWORD)GetWindowLong(hWnd, GWL_STYLE);
+        dwStyle &= ~WS_MAXIMIZEBOX;
+        SetWindowLong(hWnd, GWL_STYLE, (DWORD)dwStyle);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME | RDW_ERASENOW);
+
+        //Bloquear la opcion de cambiarle el tamaño a la ventana
+        dwStyle &= ~WS_SIZEBOX;
+        SetWindowLong(hWnd, GWL_STYLE, (DWORD)dwStyle);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME | RDW_ERASENOW);
+        break;
+    }
+                  
     case WM_CLOSE: {
         DestroyWindow(WndPila_QuitarCima(&Pila));
         EnableWindow(WndPila_Cima(Pila), TRUE);
         SetFocus(WndPila_Cima(Pila));
+        break;
+    }
+    case WM_COMMAND: {
+        switch (wParam){
+        case ID_CLOSE_HELP:                                 //Boton que cierra la ventana
+        {
+            DestroyWindow(WndPila_QuitarCima(&Pila));
+            EnableWindow(WndPila_Cima(Pila), TRUE);
+            SetFocus(WndPila_Cima(Pila));
+            break;
+        }
+        break;
+        }
+     break;
+    }
+    default: {
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    }
+    return 0;
+}
+
+LRESULT CALLBACK WindowProcedureAbout(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    static HINSTANCE estancia = NULL;
+    const wchar_t cadena_texto[] = L"Picoto Calculator v0.5 final version - marzo de 2022, gracias por usar este programa, especial agradecimiento a Alien-Z y a Carlos Obregón por la inspiración y sobretodo a ti por usar este programa, saludos!";
+    switch (message) {
+    case WM_CREATE: {
+        estancia = ((LPCREATESTRUCT)lParam)->hInstance;
+        CreateWindowW(L"static", cadena_texto, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 20, 80, 345, 200, hWnd, NULL, NULL, NULL);
+        botonAceptar = CreateWindow("Button", "Aceptar", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 55, 320, 120, 25, hWnd, (HMENU)ID_CLOSE_ABOUT, estancia, 0);
+        botonGitHub = CreateWindow("Button", "Mi perfil de GitHub", BS_DEFPUSHBUTTON | BS_CENTER | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 200, 320, 130, 25, hWnd, (HMENU)ID_GITHUB, estancia, 0);
+
+        //Bloquear el boton "maximizar"
+        DWORD dwStyle = (DWORD)GetWindowLong(hWnd, GWL_STYLE);
+        dwStyle &= ~WS_MAXIMIZEBOX;
+        SetWindowLong(hWnd, GWL_STYLE, (DWORD)dwStyle);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME | RDW_ERASENOW);
+
+        //Bloquear la opcion de cambiarle el tamaño a la ventana
+        dwStyle &= ~WS_SIZEBOX;
+        SetWindowLong(hWnd, GWL_STYLE, (DWORD)dwStyle);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_FRAME | RDW_ERASENOW);
+        break;
+    }
+
+    case WM_CLOSE: {
+        DestroyWindow(WndPila_QuitarCima(&Pila));
+        EnableWindow(WndPila_Cima(Pila), TRUE);
+        SetFocus(WndPila_Cima(Pila));
+        break;
+    }
+    case WM_COMMAND: {
+        switch (wParam) {
+        case ID_CLOSE_ABOUT:                                 //Boton que cierra la ventana
+        {
+            DestroyWindow(WndPila_QuitarCima(&Pila));
+            EnableWindow(WndPila_Cima(Pila), TRUE);
+            SetFocus(WndPila_Cima(Pila));
+            break;
+        }
+        case ID_GITHUB:                                 //Boton que cierra la ventana
+        {
+            ShellExecute(NULL, "open", "https://github.com/PabloArias98", NULL, NULL, SW_SHOWNORMAL);
+            break;
+        }
+        break;
+        }
         break;
     }
     default: {
