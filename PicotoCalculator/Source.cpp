@@ -3,8 +3,15 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <math.h>
+#include <string>
 
 
+#define BOX_ELLIPSE  50
+#define BOX_RECT     51
+#define CCH_MAXLABEL 52 
+#define CX_MARGIN    53
+
+#define IDM_SCREEN_COPY 100
 #define IDM_FILE_RESET 102
 #define IDM_FILE_EXIT 103
 #define IDM_PROGRAM_HELP 104
@@ -31,18 +38,35 @@ LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WindowProcedureChild(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WindowProcedureAbout(HWND, UINT, WPARAM, LPARAM);
 
+typedef struct tagLABELBOX {  // box 
+    RECT rcText;    // coordinates of rectangle containing text 
+    BOOL fSelected; // TRUE if the label is selected 
+    BOOL fEdit;     // TRUE if text is selected 
+    int nType;      // rectangular or elliptical 
+    int ichCaret;   // caret position 
+    int ichSel;     // with ichCaret, delimits selection 
+    int nXCaret;    // window position corresponding to ichCaret 
+    int nXSel;      // window position corresponding to ichSel 
+    int cchLabel;   // length of text in atchLabel 
+    TCHAR atchLabel[CCH_MAXLABEL];
+} LABELBOX, * PLABELBOX;
+
+
 //funcion para imprimir en pantalla
 void imprimirEdit(int i);
 
 //funcion que anade el menu
 void anadirMenus(HWND);
 
+
 //mensajes de info
 int mostrarMensajeReset();
 int mostrarMensajeReset2();
 int mostrarMensajeError();
-int mostrarRecuadroAcercaDe();
 int confirmarCerradoPrograma();
+
+void copiarContenido(HWND hwnd, const std::string &s);
+
 //Funcion que concatena los numeros en pantalla
 double calcular(double primer_num, double segundo_num, int operacion);     //Funcion que realiza las operaciones
 
@@ -71,6 +95,7 @@ HWND botonRaiz;
 HWND botonAceptar;
 HWND botonGitHub;
 
+using namespace std;
 
 const TCHAR szClassName[] = _T("CodeBlocksWindowsApp");
 const TCHAR szChildClassName[] = _T("Temas de Ayuda");
@@ -242,7 +267,7 @@ void anadirMenus(HWND hwnd)
     AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
     AppendMenuW(hMenu, MF_STRING, IDM_FILE_EXIT, L"&Salir");
 
-    AppendMenuW(hMenu2, MF_STRING, 0, L"&En proximas versiones, paciencia!");
+    AppendMenuW(hMenu2, MF_STRING, IDM_SCREEN_COPY, L"&Copiar contenido de pantalla");
 
     AppendMenuW(hMenu3, MF_STRING, IDM_PROGRAM_HELP, L"&Temas de ayuda");
     AppendMenuW(hMenu3, MF_SEPARATOR, 0, NULL);
@@ -272,6 +297,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     HDC hdc;
     static HINSTANCE estancia = NULL;
     HWND Wnd;
+    string contenido;
     //Variables
     char cadenaEditMain[31];
     static int operacion;
@@ -328,6 +354,11 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     {
         switch (LOWORD(wParam))
         {
+        case IDM_SCREEN_COPY:
+            to_string(GetWindowText(edit, cadenaEditMain, 30));
+            contenido.assign(cadenaEditMain);
+            copiarContenido(edit, contenido);
+            break;
         case IDM_FILE_RESET:
             mostrarMensajeReset();
             operando_1 = 0;
@@ -666,3 +697,19 @@ double calcular(double op_1, double op_2, int operacion)   //Funcion para calcul
 
     return resultado;                                                    //Devuelve el resultado
 }
+
+void copiarContenido(HWND edit, const std::string &s) {
+    OpenClipboard(edit);
+    EmptyClipboard();
+    HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, s.size() + 1);
+    if (!hg) {
+        CloseClipboard();
+        return;
+    }
+    memcpy(GlobalLock(hg), s.c_str(), s.size()+1);
+    GlobalUnlock(hg);
+    SetClipboardData(CF_TEXT, hg);
+    CloseClipboard();
+    GlobalFree(hg);
+}
+
