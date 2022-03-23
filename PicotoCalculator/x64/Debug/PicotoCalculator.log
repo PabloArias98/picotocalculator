@@ -1,6 +1,6 @@
 ﻿  Source.cpp
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(193,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(358,22): warning C4834: se descarta el valor devuelto de la función con el atributo "nodiscard"
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(297,9): warning C4101: 'hdc': variable local sin referencia
-C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(296,17): warning C4101: 'ps': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(194,20): warning C4244: 'return': conversión de 'WPARAM' a 'int'; posible pérdida de datos
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(360,22): warning C4834: se descarta el valor devuelto de la función con el atributo "nodiscard"
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(299,9): warning C4101: 'hdc': variable local sin referencia
+C:\Users\Pablo\source\repos\PicotoCalculator\PicotoCalculator\Source.cpp(298,17): warning C4101: 'ps': variable local sin referencia
   PicotoCalculator.vcxproj -> C:\Users\Pablo\source\repos\PicotoCalculator\x64\Debug\PicotoCalculator.exe

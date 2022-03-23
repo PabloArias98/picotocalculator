@@ -12,6 +12,7 @@
 #define CX_MARGIN    53
 
 #define IDM_SCREEN_COPY 100
+#define IDM_SCREEN_DELETE 101
 #define IDM_FILE_RESET 102
 #define IDM_FILE_EXIT 103
 #define IDM_PROGRAM_HELP 104
@@ -164,7 +165,7 @@ int WINAPI WinMain(_In_ HINSTANCE hThisInstance,
     hwnd = CreateWindowEx(
         0,                   /* Extended possibilites for variation */
         szClassName,         /* Classname */
-        _T("Picoto Calculator v0.1"),
+        _T("Picoto Calculator 0.5.2"),
         WS_OVERLAPPEDWINDOW, /* default window */
         450,       /* Windows decides the position */
         360,       /* where the window ends up on the screen */
@@ -267,7 +268,8 @@ void anadirMenus(HWND hwnd)
     AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
     AppendMenuW(hMenu, MF_STRING, IDM_FILE_EXIT, L"&Salir");
 
-    AppendMenuW(hMenu2, MF_STRING, IDM_SCREEN_COPY, L"&Copiar contenido de pantalla");
+    AppendMenuW(hMenu2, MF_STRING, IDM_SCREEN_COPY, L"&Copiar contenido");
+    AppendMenuW(hMenu2, MF_STRING, IDM_SCREEN_DELETE, L"&Borrar contenido");
 
     AppendMenuW(hMenu3, MF_STRING, IDM_PROGRAM_HELP, L"&Temas de ayuda");
     AppendMenuW(hMenu3, MF_SEPARATOR, 0, NULL);
@@ -358,6 +360,9 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             to_string(GetWindowText(edit, cadenaEditMain, 30));
             contenido.assign(cadenaEditMain);
             copiarContenido(edit, contenido);
+            break;
+        case IDM_SCREEN_DELETE:
+            SetWindowText(edit, "");
             break;
         case IDM_FILE_RESET:
             mostrarMensajeReset();
